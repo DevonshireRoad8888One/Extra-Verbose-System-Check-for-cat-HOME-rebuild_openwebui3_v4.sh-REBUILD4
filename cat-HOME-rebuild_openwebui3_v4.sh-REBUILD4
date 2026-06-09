@@ -1,0 +1,21 @@
+cd ~/openwebui3
+
+# Syntax check
+bash -n start.sh stop.sh check-security.sh 2>&1 | cat
+
+# No corruption
+grep -RInE '\*\*|\*\*|WEBUIS_|OLLAMAP_|echo !|PORT=WEBUI_PORT' . || echo "✅ Clean"
+
+# Permissions
+stat -c '%a %U:%G %n' . data models logs run .env .webui_secret_key
+
+# Secret is random
+wc -c .webui_secret_key
+head -c 20 .webui_secret_key | cat
+
+# Binding
+ss -ltnp | grep -E ':8001|:11436'
+
+# Full check
+./check-security.sh
+
